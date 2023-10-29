@@ -25,9 +25,14 @@
       </div>
       <p id="game-goal"></p>
       <div id="fishbait_count">
-        <p>{{ "Umpan Ikan Merah :" + state.fishBaitCount.red }}</p>
-        <p>{{ "Umpan Ikan Biru :" + state.fishBaitCount.blue }}</p>
-        <p>{{ "Umpan Ikan Hijau :" + state.fishBaitCount.green }}</p>
+        <p>{{ "Umpan Ikan Merah : " + state.fishBaitCount.red }}</p>
+        <p>{{ "Umpan Ikan Biru : " + state.fishBaitCount.blue }}</p>
+        <p>{{ "Umpan Ikan Hijau : " + state.fishBaitCount.green }}</p>
+      </div>
+      <div id="fishavailable_count">
+        <p>{{ "Sisa Ikan Merah : " + state.fishAvailableCount.red }}</p>
+        <p>{{ "Sisa Ikan Biru : " + state.fishAvailableCount.blue }}</p>
+        <p>{{ "Sisa Ikan Hijau : " + state.fishAvailableCount.green }}</p>
       </div>
     </div>
     <div id="click-container">
@@ -64,6 +69,11 @@ const state = reactive({
     blue: 0,
     green: 0,
   },
+  fishAvailableCount: {
+    red: 0,
+    blue: 0,
+    green: 0,
+  },
 });
 
 const getData = computed(() => {
@@ -86,6 +96,7 @@ watch(props, (value) => {
   state.fishLoad = fishLoad;
 
   updateFishBaitCount();
+  updateFishAvailableCount();
 });
 
 const updateFishBaitCount = () => {
@@ -96,6 +107,16 @@ const updateFishBaitCount = () => {
   state.fishBaitCount.red = getRedFish.length;
   state.fishBaitCount.blue = getBlueFish.length;
   state.fishBaitCount.green = getGreenFish.length;
+};
+
+const updateFishAvailableCount = () => {
+  let getRedFish = state.fishLoad.find((el) => el.fishColor === "red");
+  let getBlueFish = state.fishLoad.find((el) => el.fishColor === "blue");
+  let getGreenFish = state.fishLoad.find((el) => el.fishColor === "green");
+
+  state.fishAvailableCount.red = getRedFish.countToday;
+  state.fishAvailableCount.blue = getBlueFish.countToday;
+  state.fishAvailableCount.green = getGreenFish.countToday;
 };
 
 onMounted(() => {
@@ -110,6 +131,7 @@ onMounted(() => {
   const gameStats = document.querySelector("#game-stats");
   const gameGoal = document.querySelector("#game-goal");
   const fishBaitCount = document.querySelector("#fishbait_count");
+  const fishAvailableCount = document.querySelector("#fishavailable_count");
   const gameDay = document.querySelector("#game-day");
   const gameTimer = document.querySelector("#game-timer");
   const gameTimerGauge = document.querySelector(".timer-gauge");
@@ -223,6 +245,8 @@ onMounted(() => {
     gameStats.style.display = "flex";
     gameGoal.style.display = "block";
     fishBaitCount.style.display = "block";
+    fishAvailableCount.style.display = "block";
+
     createItems();
   }
 
@@ -435,6 +459,7 @@ onMounted(() => {
           }
 
           let getFishBait = state.fishBait.findIndex((el) => el.name === "red");
+
           // Bukan Umpan nya
           if (getFishBait == -1) {
             hitText.innerText =
@@ -452,6 +477,9 @@ onMounted(() => {
 
           //Melakukan update umpan ikan
           updateFishBaitCount();
+
+          //Melakukan update ikan
+          state.fishAvailableCount.red = state.fishAvailableCount.red - 1;
 
           hitText.innerText = "+1";
           hitText.style.color = "#00ffcd";
@@ -495,7 +523,10 @@ onMounted(() => {
 
           //Melakukan update umpan ikan
           updateFishBaitCount();
-          
+
+          //Melakukan update ikan
+          state.fishAvailableCount.blue = state.fishAvailableCount.blue - 1;
+
           hitText.innerText = "+5";
           hitText.style.color = "#9766d3";
           rareBlop.play();
@@ -539,6 +570,9 @@ onMounted(() => {
           //Melakukan update umpan ikan
           updateFishBaitCount();
 
+          //Melakukan update ikan
+          state.fishAvailableCount.green = state.fishAvailableCount.green - 1;
+
           hitText.innerText = "+5";
           hitText.style.color = "#9766d3";
           rareBlop.play();
@@ -569,6 +603,7 @@ onMounted(() => {
         //   endDay(true);
         //   sec = 0;
         // }
+
         setTimeout(function () {
           clickContainer.removeChild(hitText);
         }, 1000);
@@ -593,6 +628,8 @@ onMounted(() => {
     clickContainer.style.display = "none";
     gameGoal.style.display = "none";
     fishBaitCount.style.display = "none";
+    fishAvailableCount.style.display = "none";
+
     startBtn.style.top = "66%";
     if (!died) {
       console.log(`Day${day}`);
