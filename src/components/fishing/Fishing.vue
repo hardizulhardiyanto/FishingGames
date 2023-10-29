@@ -24,6 +24,11 @@
         <span id="game-score">Total Score: 0</span>
       </div>
       <p id="game-goal"></p>
+      <div id="fishbait_count">
+        <p>{{ "Umpan Ikan Merah :" + state.fishBaitCount.red }}</p>
+        <p>{{ "Umpan Ikan Biru :" + state.fishBaitCount.blue }}</p>
+        <p>{{ "Umpan Ikan Hijau :" + state.fishBaitCount.green }}</p>
+      </div>
     </div>
     <div id="click-container">
       <span id="line"></span>
@@ -54,6 +59,11 @@ const state = reactive({
   fishBait: [],
   fishLoad: [],
   equipment: "",
+  fishBaitCount: {
+    red: 0,
+    blue: 0,
+    green: 0,
+  },
 });
 
 const getData = computed(() => {
@@ -63,6 +73,8 @@ const getData = computed(() => {
   state.fishBait = playerStart.fishBait;
   state.equipment = playerStart.equipment;
   state.fishLoad = fishLoad;
+
+  updateFishBaitCount();
 });
 
 watch(props, (value) => {
@@ -72,7 +84,19 @@ watch(props, (value) => {
   state.fishBait = playerStart.fishBait;
   state.equipment = playerStart.equipment;
   state.fishLoad = fishLoad;
+
+  updateFishBaitCount();
 });
+
+const updateFishBaitCount = () => {
+  let getRedFish = state.fishBait.filter((el) => el.name === "red");
+  let getBlueFish = state.fishBait.filter((el) => el.name === "blue");
+  let getGreenFish = state.fishBait.filter((el) => el.name === "green");
+
+  state.fishBaitCount.red = getRedFish.length;
+  state.fishBaitCount.blue = getBlueFish.length;
+  state.fishBaitCount.green = getGreenFish.length;
+};
 
 onMounted(() => {
   const gameContainer = document.querySelector("#game-container");
@@ -85,6 +109,7 @@ onMounted(() => {
   const startBtn = document.querySelector("#start-btn");
   const gameStats = document.querySelector("#game-stats");
   const gameGoal = document.querySelector("#game-goal");
+  const fishBaitCount = document.querySelector("#fishbait_count");
   const gameDay = document.querySelector("#game-day");
   const gameTimer = document.querySelector("#game-timer");
   const gameTimerGauge = document.querySelector(".timer-gauge");
@@ -197,6 +222,7 @@ onMounted(() => {
     clickContainer.style.display = "block";
     gameStats.style.display = "flex";
     gameGoal.style.display = "block";
+    fishBaitCount.style.display = "block";
     createItems();
   }
 
@@ -212,6 +238,7 @@ onMounted(() => {
     createRareFishInterval = setInterval(createRareFish, 1250);
     createSharkInterval = setInterval(createShark, 4000);
   }
+
   //create timer function
   function createTimer() {
     gameTimer.innerText = "15s";
@@ -423,6 +450,9 @@ onMounted(() => {
             state.fishBait.length
           );
 
+          //Melakukan update umpan ikan
+          updateFishBaitCount();
+
           hitText.innerText = "+1";
           hitText.style.color = "#00ffcd";
           blop.play();
@@ -445,7 +475,9 @@ onMounted(() => {
             return;
           }
 
-          let getFishBait = state.fishBait.findIndex((el) => el.name === "blue");
+          let getFishBait = state.fishBait.findIndex(
+            (el) => el.name === "blue"
+          );
           // Bukan Umpan nya
           if (getFishBait == -1) {
             hitText.innerText =
@@ -461,6 +493,9 @@ onMounted(() => {
             state.fishBait.length
           );
 
+          //Melakukan update umpan ikan
+          updateFishBaitCount();
+          
           hitText.innerText = "+5";
           hitText.style.color = "#9766d3";
           rareBlop.play();
@@ -468,22 +503,24 @@ onMounted(() => {
           currentScore += 5;
           fishTracker[1]++;
         } else if (type.contains("shark")) {
-          //Bukan Pancingannya  
+          //Bukan Pancingannya
           if (state.equipment !== "large") {
             hitText.innerText = "Fish not " + state.equipment;
             hitText.style.color = "#ffffff";
             trashSound.play();
             return;
           }
-           // Umpan Habis
-           if (state.fishBait.length === 0) {
+          // Umpan Habis
+          if (state.fishBait.length === 0) {
             bite.play();
             endDay(true);
             sec = 0;
             return;
           }
 
-          let getFishBait = state.fishBait.findIndex((el) => el.name === "green");
+          let getFishBait = state.fishBait.findIndex(
+            (el) => el.name === "green"
+          );
           // Bukan Umpan nya
           if (getFishBait == -1) {
             hitText.innerText =
@@ -498,7 +535,10 @@ onMounted(() => {
             getFishBait + 1,
             state.fishBait.length
           );
-          
+
+          //Melakukan update umpan ikan
+          updateFishBaitCount();
+
           hitText.innerText = "+5";
           hitText.style.color = "#9766d3";
           rareBlop.play();
@@ -552,6 +592,7 @@ onMounted(() => {
     gameStats.style.display = "none";
     clickContainer.style.display = "none";
     gameGoal.style.display = "none";
+    fishBaitCount.style.display = "none";
     startBtn.style.top = "66%";
     if (!died) {
       console.log(`Day${day}`);
