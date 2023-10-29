@@ -12,6 +12,11 @@ const routes = [
     name: "Dashboard",
     component: () => import('@/views/Dashboard.vue')
   },
+  {
+    path: '/play',
+    name: "Play",
+    component: () => import('@/views/Playing.vue')
+  },
 ]
 
 const router = createRouter({

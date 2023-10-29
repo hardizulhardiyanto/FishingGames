@@ -9,8 +9,33 @@ export const useStartingAppStore = defineStore({
   id: "StartingApp",
 
   state: () => ({
-    fishTarget: []
-  }),  
+    fishTarget: [],
+    playerStart: {
+      equipment: "medium", //pancingan
+      fishBait: [
+        {
+          name: "red",
+          price: 1,
+          fishCatch: 1,
+        },
+        {
+          name: "red",
+          price: 1,
+          fishCatch: 1,
+        },
+        {
+          name: "red",
+          price: 1,
+          fishCatch: 1,
+        },
+        {
+          name: "green",
+          price: 3,
+          fishCatch: 1,
+        },
+      ],
+    },
+  }),
 
   actions: {
     async enterUser(userName) {
@@ -36,8 +61,8 @@ export const useStartingAppStore = defineStore({
     },
 
     async loadFishTarget() {
-      let color = ['red', 'blue', 'green'] 
-      let initPercentage = [10, 20, 30] 
+      let color = ["red", "blue", "green"];
+      let initPercentage = [10, 20, 30];
       let fishingCount = fishEquipment.map((el, i) => {
         let result = {
           fishName: el.name,
@@ -47,17 +72,27 @@ export const useStartingAppStore = defineStore({
         };
         return result;
       });
-      let getPercentageFish = getRandomPersentage(fishingCount)
+      let getPercentageFish = getRandomPersentage(fishingCount);
       this.fishTarget = getPercentageFish;
+      cookies.set("fishTarget", JSON.stringify(getPercentageFish));
 
       return getPercentageFish;
     },
 
     async getRequirement() {
-        return {
-            fishBait,
-            fishEquipment
-        }
+      return {
+        fishBait,
+        fishEquipment,
+      };
+    },
+
+    async loadPlayGames() {
+      let result = {
+        fishLoad: JSON.parse(cookies.get("fishTarget")),
+        playerStart: JSON.parse(JSON.stringify(this.playerStart))
+      }
+
+      return result
     }
   },
 });

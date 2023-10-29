@@ -11,6 +11,9 @@
                 />
                 <FishInfo />
             </v-col>
+            <v-col>
+              <v-btn block @click="router.push({name: 'Play'})">PLAY GAMES</v-btn>
+            </v-col>
 
           </v-row>
         </v-card-item>
@@ -24,8 +27,10 @@ import FishInfo from "@/components/FishInfo.vue";
 import UserInfo from "@/components/UserInfo.vue";
 import { useStartingAppStore } from "@/store/startingApp";
 import { reactive } from "vue";
-const startingAppStore = useStartingAppStore();
+import { useRouter } from "vue-router"
 
+const startingAppStore = useStartingAppStore();
+const router = useRouter();
 const state = reactive({
   userName: "",
   gold: 0,
@@ -38,11 +43,11 @@ const getUsers = async () => {
   let userDetail = await startingAppStore.getUser();
   state.userName = userDetail.userName;
   state.gold = userDetail.gold
-  console.log("userDetail >> ", userDetail);
+  // console.log("userDetail >> ", userDetail);
   let loadFishingTarget = await startingAppStore.loadFishTarget();
-  console.log("loadFishingTarget >> ", loadFishingTarget);
+  // console.log("loadFishingTarget >> ", loadFishingTarget);
   let loadRequrement = await startingAppStore.getRequirement();
-  console.log("loadRequrement >> ", loadRequrement);
+  // console.log("loadRequrement >> ", loadRequrement);
 };
 
 getUsers();
