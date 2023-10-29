@@ -3,7 +3,7 @@
     <v-card elevation="4" class="startingapp__player">
       <v-card-title class="bg-white"> Welcome Fishing Games </v-card-title>
       <v-card-item>
-        <v-text-field label="Enter Your Name" color="white" v-model="state.yourName" />
+        <v-text-field label="Enter Your Name" color="white" v-model="state.userName" />
         <v-btn block @click="enterBtn"> ENTER </v-btn>
       </v-card-item>
     </v-card>
@@ -12,13 +12,18 @@
 
 <script setup>
 import { reactive } from "vue";
+import { useStartingAppStore } from "@/store/startingApp";
+import { useRouter } from "vue-router";
 
+const startingAppStore = useStartingAppStore();
+const router = useRouter();
 const state = reactive({
-  yourName: "",
+  userName: "",
 });
 
 const enterBtn = () => {
-  //send to store state
+    startingAppStore.enterUser(state.userName);
+    router.push({name: "Dashboard"})
 };
 </script>
 
