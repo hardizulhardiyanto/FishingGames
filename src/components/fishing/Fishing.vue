@@ -33,8 +33,9 @@
 </template>
 
 <script setup>
+import { watch } from "vue";
 //@todo start
-import { onMounted } from "vue";
+import { computed, onMounted, reactive } from "vue";
 import sound_bgm from "./sfx/Bug_Catching.mp3";
 import sound_blop from "./sfx/fish.mp3";
 import sound_rareBlop from "./sfx/rare-fish.mp3";
@@ -43,10 +44,34 @@ import sound_bzzt from "./sfx/bzzt.mp3";
 import sound_bite from "./sfx/bite.mp3";
 
 const props = defineProps({
-  loadPlayer: {
+  loadPlayGames: {
     type: Object,
     default: () => {},
   },
+});
+
+const state = reactive({
+  fishBait: [],
+  fishLoad: [],
+  equipment: "",
+});
+
+const getData = computed(() => {
+  let { fishLoad, playerStart } = JSON.parse(
+    JSON.stringify(props.loadPlayGames)
+  );
+  state.fishBait = playerStart.fishBait;
+  state.equipment = playerStart.equipment;
+  state.fishLoad = fishLoad;
+});
+
+watch(props, (value) => {
+  let { fishLoad, playerStart } = JSON.parse(
+    JSON.stringify(props.loadPlayGames)
+  );
+  state.fishBait = playerStart.fishBait;
+  state.equipment = playerStart.equipment;
+  state.fishLoad = fishLoad;
 });
 
 onMounted(() => {
@@ -121,6 +146,7 @@ onMounted(() => {
   var trashSound; // trash sound
   var bzzt; //jellyfish zapping sound
   var bite; //shark bite sound
+  var sec;
 
   //event listeners
   startBtn.addEventListener("click", startGame);
@@ -152,7 +178,7 @@ onMounted(() => {
 
   //@todo start game function
   function startGame() {
-    // day = 4;
+    // day = 4; //for testing
     //initialise sounds
     blop = new Audio(sound_blop);
     rareBlop = new Audio(sound_rareBlop);
@@ -173,6 +199,8 @@ onMounted(() => {
     gameGoal.style.display = "block";
     createItems();
   }
+
+  // startGame(); //Setelah development diaktifkan lg, untuk auto start
   //create items function
   function createItems() {
     createTimer();
@@ -183,7 +211,6 @@ onMounted(() => {
     createFishInterval = setInterval(createFish, 250);
     createRareFishInterval = setInterval(createRareFish, 1250);
     createSharkInterval = setInterval(createShark, 4000);
-
   }
   //create timer function
   function createTimer() {
@@ -248,44 +275,7 @@ onMounted(() => {
       }, 350);
     }, 650);
   }
-  //create trash function
-  function createTrash() {
-    let trash = document.createElement("div");
-    trash.classList.add("item");
-    trash.classList.add("trash");
-    clickContainer.appendChild(trash);
-    setPosition(trash);
-    trash.addEventListener("mouseover", hit);
-    setTimeout(function () {
-      if (!trash.classList.contains("caught")) {
-        trash.classList.add("disappear");
-      }
-      setTimeout(function () {
-        if (clickContainer.contains(trash)) {
-          clickContainer.removeChild(trash);
-        }
-      }, 350);
-    }, 3000);
-  }
-  //create jellyfish function
-  function createJellyfish() {
-    let jellyfish = document.createElement("div");
-    jellyfish.classList.add("item");
-    jellyfish.classList.add("jellyfish");
-    clickContainer.appendChild(jellyfish);
-    setPosition(jellyfish);
-    jellyfish.addEventListener("mouseover", hit);
-    setTimeout(function () {
-      if (!jellyfish.classList.contains("caught")) {
-        jellyfish.classList.add("disappear");
-      }
-      setTimeout(function () {
-        if (clickContainer.contains(jellyfish)) {
-          clickContainer.removeChild(jellyfish);
-        }
-      }, 350);
-    }, 3000);
-  }
+
   //create shark function
   function createShark() {
     let shark = document.createElement("div");
@@ -391,6 +381,7 @@ onMounted(() => {
     }
   }
   function hit(event) {
+    //@todo HIT IKAN
     if (!fishingLine.classList.contains("zapped")) {
       let type = event.target.classList;
       let hitText = document.createElement("span");
@@ -401,6 +392,37 @@ onMounted(() => {
       if (!this.classList.contains("caught")) {
         this.classList.add("caught");
         if (type.contains("fish")) {
+          // Bukan Pancingannya
+          if (state.equipment !== "small") {
+            hitText.innerText = "Fish not " + state.equipment;
+            hitText.style.color = "#ffffff";
+            trashSound.play();
+            return;
+          }
+          // Umpan Habis
+          if (state.fishBait.length === 0) {
+            bite.play();
+            endDay(true);
+            sec = 0;
+            return;
+          }
+
+          let getFishBait = state.fishBait.findIndex((el) => el.name === "red");
+          // Bukan Umpan nya
+          if (getFishBait == -1) {
+            hitText.innerText =
+              state.fishBait.length > 0
+                ? "Fish bait not RED"
+                : "Fish bait empty";
+            hitText.style.color = "#ffffff";
+            trashSound.play();
+            return;
+          }
+          state.fishBait = state.fishBait.splice(
+            getFishBait + 1,
+            state.fishBait.length
+          );
+
           hitText.innerText = "+1";
           hitText.style.color = "#00ffcd";
           blop.play();
@@ -408,6 +430,75 @@ onMounted(() => {
           currentScore++;
           fishTracker[0]++;
         } else if (type.contains("rare-fish")) {
+          // Bukan Pancingannya
+          if (state.equipment !== "medium") {
+            hitText.innerText = "Fish not " + state.equipment;
+            hitText.style.color = "#ffffff";
+            trashSound.play();
+            return;
+          }
+          // Umpan Habis
+          if (state.fishBait.length === 0) {
+            bite.play();
+            endDay(true);
+            sec = 0;
+            return;
+          }
+
+          let getFishBait = state.fishBait.findIndex((el) => el.name === "blue");
+          // Bukan Umpan nya
+          if (getFishBait == -1) {
+            hitText.innerText =
+              state.fishBait.length > 0
+                ? "Fish bait not BLUE"
+                : "Fish bait empty";
+            hitText.style.color = "#ffffff";
+            trashSound.play();
+            return;
+          }
+          state.fishBait = state.fishBait.splice(
+            getFishBait + 1,
+            state.fishBait.length
+          );
+
+          hitText.innerText = "+5";
+          hitText.style.color = "#9766d3";
+          rareBlop.play();
+          score += 5;
+          currentScore += 5;
+          fishTracker[1]++;
+        } else if (type.contains("shark")) {
+          //Bukan Pancingannya  
+          if (state.equipment !== "large") {
+            hitText.innerText = "Fish not " + state.equipment;
+            hitText.style.color = "#ffffff";
+            trashSound.play();
+            return;
+          }
+           // Umpan Habis
+           if (state.fishBait.length === 0) {
+            bite.play();
+            endDay(true);
+            sec = 0;
+            return;
+          }
+
+          let getFishBait = state.fishBait.findIndex((el) => el.name === "green");
+          // Bukan Umpan nya
+          if (getFishBait == -1) {
+            hitText.innerText =
+              state.fishBait.length > 0
+                ? "Fish bait not GREEN"
+                : "Fish bait empty";
+            hitText.style.color = "#ffffff";
+            trashSound.play();
+            return;
+          }
+          state.fishBait = state.fishBait.splice(
+            getFishBait + 1,
+            state.fishBait.length
+          );
+          
           hitText.innerText = "+5";
           hitText.style.color = "#9766d3";
           rareBlop.play();
@@ -432,11 +523,12 @@ onMounted(() => {
             fishingLine.classList.remove("zapped");
             clickContainer.classList.remove("zapped");
           }, 2000);
-        } else if (type.contains("shark")) {
-          bite.play();
-          endDay(true);
-          sec = 0;
         }
+        // else if (type.contains("shark")) {
+        //   bite.play();
+        //   endDay(true);
+        //   sec = 0;
+        // }
         setTimeout(function () {
           clickContainer.removeChild(hitText);
         }, 1000);
@@ -476,7 +568,7 @@ onMounted(() => {
       }
     } else {
       day = 0;
-      instructions.innerHTML = `<h2>Too bad!</h2><p>You provoked the shark and it destroyed your boat.<br>Your entire week of fishing went to waste!</p>`;
+      instructions.innerHTML = `<h2>Permainan Berakhir!</h2><p>Umpan Anda Telah Habis<br>Silahkan beli umpan lagi!</p>`;
     }
     infoWrapper.style.display = "block";
     startTitle.style.display = "block";

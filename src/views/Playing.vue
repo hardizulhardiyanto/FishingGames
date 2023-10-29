@@ -1,7 +1,7 @@
 <template>
     <div>
         <Fishing 
-            :loadPlayGames="loadPlayGames"
+            :loadPlayGames="state.loadPlayGames"
         />
     </div>
 </template>
@@ -9,16 +9,18 @@
 <script setup>
 import Fishing from "@/components/fishing/Fishing.vue"
 import { useStartingAppStore } from '@/store/startingApp';
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 
 const startingApp = useStartingAppStore();
 
-const loadPlayGames = ref()
+let state = reactive({
+    loadPlayGames: {}
+})
 
 const getData = async () => {
     let result = await startingApp.loadPlayGames();
-    loadPlayGames = result
-    // console.log(result);
+    state.loadPlayGames = result
+    console.log(result);
 }
 
 getData()

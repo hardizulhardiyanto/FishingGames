@@ -11,7 +11,7 @@ export const useStartingAppStore = defineStore({
   state: () => ({
     fishTarget: [],
     playerStart: {
-      equipment: "medium", //pancingan
+      equipment: "small", //pancingan
       fishBait: [
         {
           name: "red",
@@ -23,16 +23,16 @@ export const useStartingAppStore = defineStore({
           price: 1,
           fishCatch: 1,
         },
-        {
-          name: "red",
-          price: 1,
-          fishCatch: 1,
-        },
-        {
-          name: "green",
-          price: 3,
-          fishCatch: 1,
-        },
+        // {
+        //   name: "red",
+        //   price: 1,
+        //   fishCatch: 1,
+        // },
+        // {
+        //   name: "green",
+        //   price: 3,
+        //   fishCatch: 1,
+        // },
       ],
     },
   }),
