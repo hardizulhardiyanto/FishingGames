@@ -8,6 +8,7 @@
 import vuetify from './vuetify'
 import pinia from '../store'
 import router from '../router'
+import "../styles/index.css"
 
 export function registerPlugins (app) {
   app
