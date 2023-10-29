@@ -1,19 +1,14 @@
 <template>
     <v-container class="bg-white userinfo__container">
-        <p class="text-subtitle-2">{{ props.username }}</p>
-        <p class="text-subtitle-2 font-weight-regular">{{ 'your gold: '+ props.gold }}</p>
+        <p class="text-subtitle-1">{{ props.textInfo }}</p>
     </v-container>
 </template>
 
 <script setup>
 const props = defineProps({
-    username: {
+    textInfo: {
         type: String,
-        default: () => "Insert Username Props"
-    },
-    gold: {
-        type: Number,
-        default: () => 0
+        default: () => "Insert Props Info"
     }
 })
 

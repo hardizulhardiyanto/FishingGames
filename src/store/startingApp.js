@@ -49,8 +49,15 @@ export const useStartingAppStore = defineStore({
       });
       let getPercentageFish = getRandomPersentage(fishingCount)
       this.fishTarget = getPercentageFish;
-      
+
       return getPercentageFish;
     },
+
+    async getRequirement() {
+        return {
+            fishBait,
+            fishEquipment
+        }
+    }
   },
 });

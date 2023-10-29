@@ -1,3 +1,4 @@
+// Pancingan
 export const fishEquipment = [
     {
         name: "small",
@@ -16,6 +17,7 @@ export const fishEquipment = [
     }
 ]
 
+//Umpan
 export const fishBait = [
     {
         name: "red",
