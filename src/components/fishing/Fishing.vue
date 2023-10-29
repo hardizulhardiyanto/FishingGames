@@ -35,13 +35,19 @@
 <script setup>
 //@todo start
 import { onMounted } from "vue";
-import sound_bgm from "./sfx/Bug_Catching.mp3"
-import sound_blop from "./sfx/fish.mp3"
-import sound_rareBlop from "./sfx/rare-fish.mp3"
-import sound_trashSound from "./sfx/trash.mp3"
-import sound_bzzt from "./sfx/bzzt.mp3"
-import sound_bite from "./sfx/bite.mp3"
+import sound_bgm from "./sfx/Bug_Catching.mp3";
+import sound_blop from "./sfx/fish.mp3";
+import sound_rareBlop from "./sfx/rare-fish.mp3";
+import sound_trashSound from "./sfx/trash.mp3";
+import sound_bzzt from "./sfx/bzzt.mp3";
+import sound_bite from "./sfx/bite.mp3";
 
+const props = defineProps({
+  loadPlayer: {
+    type: Object,
+    default: () => {},
+  },
+});
 
 onMounted(() => {
   const gameContainer = document.querySelector("#game-container");
@@ -173,38 +179,11 @@ onMounted(() => {
     day++;
     gameDay.innerText = "Day 0" + day;
     gameGoal.innerText = `Goal: ${currentScore}/${days[day - 1].score}`;
-    //start creating items depending on the day
-    switch (day) {
-      case 1:
-        createFishInterval = setInterval(createFish, 250);
-        break;
 
-      case 2:
-        createFishInterval = setInterval(createFish, 250);
-        createRareFishInterval = setInterval(createRareFish, 2200);
-        break;
+    createFishInterval = setInterval(createFish, 250);
+    createRareFishInterval = setInterval(createRareFish, 1250);
+    createSharkInterval = setInterval(createShark, 4000);
 
-      case 3:
-        createFishInterval = setInterval(createFish, 250);
-        createRareFishInterval = setInterval(createRareFish, 1500);
-        createTrashInterval = setInterval(createTrash, 1000);
-        break;
-
-      case 4:
-        createFishInterval = setInterval(createFish, 250);
-        createRareFishInterval = setInterval(createRareFish, 1250);
-        createTrashInterval = setInterval(createTrash, 1500);
-        createJellyfishInterval = setInterval(createJellyfish, 2000);
-        break;
-
-      case 5:
-        createFishInterval = setInterval(createFish, 200);
-        createRareFishInterval = setInterval(createRareFish, 1100);
-        createTrashInterval = setInterval(createTrash, 1500);
-        createJellyfishInterval = setInterval(createJellyfish, 2000);
-        createSharkInterval = setInterval(createShark, 4000);
-        break;
-    }
   }
   //create timer function
   function createTimer() {

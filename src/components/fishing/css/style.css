@@ -125,10 +125,73 @@ button#start-btn .arrow {
   border-width: 30px 0px 30px 60px;
 }
 
+.fish_small_red {
+	width: 240px;
+	height: 128px;
+	background-image:url(../images/small_fish.svg);
+	background-size: contain;
+	background-repeat: no-repeat;
+	position: absolute;
+	transition: left 0.1s linear, top 0.1s linear, opacity 1s linear;
+	animation-name: floatUp;
+	animation-duration: 1s;
+	animation-timing-function: linear;
+}
+.fish_small_red:after {
+	content:"";
+  transform-origin: center left;
+  transform: rotate(-45deg);
+  position: absolute;
+  right: -15%;
+  top: -15%;
+}
+.fish_small_red:before,
+
+.fish_medium_blue {
+	width: 280px;
+	height: 148px;
+	background-image:url(../images/medium_fish.svg);
+	background-size: contain;
+	background-repeat: no-repeat;
+	position: absolute;
+	transition: left 0.1s linear, top 0.1s linear, opacity 1s linear;
+	animation-name: floatUp;
+	animation-duration: 1s;
+	animation-timing-function: linear;
+}
+.fish_medium_blue:after
+.fish_medium_blue:before,
+.fish_medium_blue.left {
+	transform: scaleX(-1);
+	animation-name: appear;
+  animation-duration: 0.5s;
+}
+
+.fish_large_green {
+	width: 320px;
+	height: 180px;
+	background-image:url(../images/large_fish.svg);
+	background-size: contain;
+	background-repeat: no-repeat;
+	position: absolute;
+	transition: left 0.1s linear, top 0.1s linear, opacity 1s linear;
+	animation-name: floatUp;
+	animation-duration: 1s;
+	animation-timing-function: linear;
+}
+.fish_large_green:after
+.fish_large_green:before,
+.fish_large_green.left {
+	transform: scaleX(-1);
+	animation-name: appear;
+  animation-duration: 0.5s;
+}
+
+
 .fish {
 	width: 50px;
 	height: 50px;
-	background-color: #F7A400;
+	background-color: #f70000;
 	transform:rotate(45deg);
   border-radius: 50%;
 	position: absolute;
@@ -138,7 +201,7 @@ button#start-btn .arrow {
 }
 .fish:after {
 	content:"";
-	border-color: transparent #F7A400;
+	border-color: transparent #f70000;
   border-style: solid;
   border-width: 20px 20px 20px 0px;
   transform-origin: center left;
@@ -160,9 +223,9 @@ button#start-btn .arrow {
   left: 10%;
 }
 .rare-fish {
-	width: 50px;
-	height: 50px;
-	background-color: #B02C90;
+	width: 60px;
+	height: 60px;
+	background-color: #2c30b0;
 	transform:rotate(45deg);
   border-radius: 25%;
 	position: absolute;
@@ -172,7 +235,7 @@ button#start-btn .arrow {
 }
 .rare-fish:after {
 	content:"";
-	border-color: transparent #B02C90;
+	border-color: transparent #2c30b0;
   border-style: solid;
   border-width: 20px 20px 20px 0px;
   transform-origin: center left;
@@ -182,7 +245,7 @@ button#start-btn .arrow {
   top: -15%;
 }
 .rare-fish:after {
-	border-color: transparent #B02C90;
+	border-color: transparent #2c30b0;
 }
 .fish.left,
 .rare-fish.left{
@@ -257,9 +320,9 @@ button#start-btn .arrow {
 	animation-timing-function: linear;
 }
 .shark {
-	width: 240px;
-	height: 128px;
-	background-image:url(../images/shark.svg);
+	width: 340px;
+	height: 228px;
+	background-image:url(../images/large_fish.svg);
 	background-size: contain;
 	background-repeat: no-repeat;
 	position: absolute;
