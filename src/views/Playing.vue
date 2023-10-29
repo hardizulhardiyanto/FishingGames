@@ -1,10 +1,11 @@
 <template>
     <div>
-        <p>Playing</p>
+        <Fishing />
     </div>
 </template>
 
 <script setup>
+import Fishing from "@/components/fishing/Fishing.vue"
 import { useStartingAppStore } from '@/store/startingApp';
 
 const startingApp = useStartingAppStore();
