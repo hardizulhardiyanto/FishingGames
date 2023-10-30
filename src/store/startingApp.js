@@ -12,28 +12,50 @@ export const useStartingAppStore = defineStore({
     fishTarget: [],
     playerStart: {
       equipment: "small", //pancingan
-      fishBait: [
+      equipmentList: [
         {
-          name: "red",
-          price: 1,
-          fishCatch: 1,
+          name: "small",
+          price: 5,
+          fishCatch: "small",
         },
         {
-          name: "red",
-          price: 1,
-          fishCatch: 1,
+          name: "medium",
+          price: 10,
+          fishCatch: "medium",
         },
         {
-          name: "red",
-          price: 1,
-          fishCatch: 1,
-        },
-        {
-          name: "green",
-          price: 3,
-          fishCatch: 1,
+          name: "large",
+          price: 15,
+          fishCatch: "large",
         },
       ],
+      fishBait: [
+        // {
+        //   name: "red",
+        //   price: 1,
+        //   fishCatch: 1,
+        // },
+        // {
+        //   name: "red",
+        //   price: 1,
+        //   fishCatch: 1,
+        // },
+        // {
+        //   name: "red",
+        //   price: 1,
+        //   fishCatch: 1,
+        // },
+        // {
+        //   name: "green",
+        //   price: 3,
+        //   fishCatch: 1,
+        // },
+      ],
+      fishBaitCount: {
+        red: 10,
+        blue: 10,
+        green: 10
+      }
     },
   }),
 
@@ -87,12 +109,38 @@ export const useStartingAppStore = defineStore({
     },
 
     async loadPlayGames() {
+      //start menambahkan ke state: hanya untuk development
+      // let fishBait = []
+      // for (let i = 0; i<10;i++) {
+      //   fishBait.push({
+      //     name: "red",
+      //     price: 1,
+      //     fishCatch: 1,
+      //   });
+      // }
+      // for (let i = 0; i<10;i++) {
+      //   fishBait.push({
+      //     name: "blue",
+      //     price: 1,
+      //     fishCatch: 1,
+      //   });
+      // }
+      // for (let i = 0; i<10;i++) {
+      //   fishBait.push({
+      //     name: "green",
+      //     price: 1,
+      //     fishCatch: 1,
+      //   });
+      // }
+      // this.playerStart.fishBait = fishBait
+      //end
+
       let result = {
         fishLoad: JSON.parse(cookies.get("fishTarget")),
-        playerStart: JSON.parse(JSON.stringify(this.playerStart))
-      }
+        playerStart: JSON.parse(JSON.stringify(this.playerStart)),
+      };
 
-      return result
-    }
+      return result;
+    },
   },
 });

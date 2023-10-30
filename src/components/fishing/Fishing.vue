@@ -25,7 +25,7 @@
       </div>
       <p id="game-goal"></p>
       <div id="game__point">
-        {{ "Goal : " + state.percentageGetFish + "%" + " / 100%" }}
+        {{ "Goal : " + state.percentageGetFish + "%" + " to 100%" }}
       </div>
       <div id="fishbait_count">
         <p>{{ "Umpan Ikan Merah : " + state.fishBaitCount.red }}</p>
@@ -67,12 +67,9 @@ const props = defineProps({
 const state = reactive({
   fishBait: [],
   fishLoad: [],
-  equipment: "",
-  fishBaitCount: {
-    red: 0,
-    blue: 0,
-    green: 0,
-  },
+  // equipment: "",
+  equipmentList: [],
+  fishBaitCount: {},
   fishAvailableCount: {
     red: 0,
     blue: 0,
@@ -93,37 +90,35 @@ const state = reactive({
   percentageGetFish: 0,
 });
 
-const getData = computed(() => {
-  let { fishLoad, playerStart } = JSON.parse(
-    JSON.stringify(props.loadPlayGames)
-  );
-  state.fishBait = playerStart.fishBait;
-  state.equipment = playerStart.equipment;
-  state.fishLoad = fishLoad;
-
-  updateFishBaitCount();
-});
-
 watch(props, (value) => {
   let { fishLoad, playerStart } = JSON.parse(
     JSON.stringify(props.loadPlayGames)
   );
-  state.fishBait = playerStart.fishBait;
-  state.equipment = playerStart.equipment;
+  // state.fishBait = playerStart.fishBait;
+  state.fishBaitCount = playerStart.fishBaitCount;
   state.fishLoad = fishLoad;
+  state.equipmentList = playerStart.equipmentList;
 
-  updateFishBaitCount();
   updateFishAvailableCount();
 });
 
-const updateFishBaitCount = () => {
-  let getRedFish = state.fishBait.filter((el) => el.name === "red");
-  let getBlueFish = state.fishBait.filter((el) => el.name === "blue");
-  let getGreenFish = state.fishBait.filter((el) => el.name === "green");
+watch(state, (val) => {
+  console.log('pre > ', state.percentageGetFish);
 
-  state.fishBaitCount.red = getRedFish.length;
-  state.fishBaitCount.blue = getBlueFish.length;
-  state.fishBaitCount.green = getGreenFish.length;
+})
+
+const updateFishBaitCount = (fish) => {
+  switch (fish) {
+    case "red":
+      state.fishBaitCount.red = state.fishBaitCount.red - 1;
+      break;
+    case "blue":
+      state.fishBaitCount.blue = state.fishBaitCount.blue - 1;
+      break;
+    case "green":
+      state.fishBaitCount.green = state.fishBaitCount.green - 1;
+      break;
+  }
 };
 
 const updateFishAvailableCount = () => {
@@ -151,14 +146,18 @@ const fishCounting = (fish) => {
           getRedFish.percentage
         );
         state.fishRedAdd.percentage = getPercentage;
-        state.percentageGetFish =
-          state.percentageGetFish + state.fishRedAdd.percentage;
+        if (getPercentage == getRedFish.percentage) {
+          state.percentageGetFish =
+            state.percentageGetFish + state.fishRedAdd.percentage;
+        }
       }
 
       break;
     case "blue":
       if (state.fishAvailableCount.blue - 1 >= 0) {
         state.fishAvailableCount.blue = state.fishAvailableCount.blue - 1;
+        state.fishBlueAdd.count = state.fishBlueAdd.count += 1;
+
         //Counting Percentage
         let getBlueFish = state.fishLoad.find((el) => el.fishColor === "blue");
         let getPercentage = countPercentage(
@@ -167,23 +166,30 @@ const fishCounting = (fish) => {
           getBlueFish.percentage
         );
         state.fishBlueAdd.percentage = getPercentage;
-        state.percentageGetFish =
-          state.percentageGetFish + state.fishBlueAdd.percentage;
+        if (getPercentage == getBlueFish.percentage) {
+          state.percentageGetFish =
+            state.percentageGetFish + state.fishBlueAdd.percentage;
+        }
       }
       break;
     case "green":
       if (state.fishAvailableCount.green - 1 >= 0) {
         state.fishAvailableCount.green = state.fishAvailableCount.green - 1;
+        state.fishGreenAdd.count = state.fishGreenAdd.count += 1;
         //Counting Percentage
-        let getGreenFish = state.fishLoad.find((el) => el.fishColor === "green");
+        let getGreenFish = state.fishLoad.find(
+          (el) => el.fishColor === "green"
+        );
         let getPercentage = countPercentage(
           state.fishGreenAdd.count,
           getGreenFish.countToday,
           getGreenFish.percentage
         );
         state.fishGreenAdd.percentage = getPercentage;
-        state.percentageGetFish =
+        if (getPercentage == getGreenFish.percentage) {
+          state.percentageGetFish =
           state.percentageGetFish + state.fishGreenAdd.percentage;
+        }
       }
       break;
   }
@@ -340,25 +346,28 @@ onMounted(() => {
     gameTimer.innerText = "15s";
     gameScore.innerText = "Total Score: 0";
     let sec = 0;
-    gameTimerInterval = setInterval(startGameTimer, 1000);
-    function startGameTimer() {
-      gameTimer.textContent = 15 - sec + "s";
-      if (sec === 15) {
-        sec = 0;
-        endDay(false);
-        gameTimer.textContent = 15 - sec + "s";
-        gameTimer.classList.remove("warning");
-        gameTimerGauge.classList.remove("ticking");
-      } else {
-        if (sec === 1) {
-          gameTimerGauge.classList.add("ticking");
-        }
-        if (sec > 9) {
-          gameTimer.classList.add("warning");
-        }
-        sec++;
-      }
-    }
+    // gameTimerInterval = setInterval(startGameTimer, 1000);
+    gameTimerInterval = 9;
+    // console.log('gameTimerInterval >>' , gameTimerInterval);
+
+    // function startGameTimer() {
+    //   gameTimer.textContent = 15 - sec + "s";
+    //   if (sec === 15) {
+    //     sec = 0;
+    //     endDay(false);
+    //     gameTimer.textContent = 15 - sec + "s";
+    //     gameTimer.classList.remove("warning");
+    //     gameTimerGauge.classList.remove("ticking");
+    //   } else {
+    //     if (sec === 1) {
+    //       gameTimerGauge.classList.add("ticking");
+    //     }
+    //     if (sec > 9) {
+    //       gameTimer.classList.add("warning");
+    //     }
+    //     sec++;
+    //   }
+    // }
   }
   //create fish function
   function createFish() {
@@ -514,42 +523,33 @@ onMounted(() => {
       hitText.style.top = this.style.top;
       if (!this.classList.contains("caught")) {
         this.classList.add("caught");
-        // RED
+        //@todo RED FISH AREA
         if (type.contains("fish")) {
+          //Check FISH
+          if (state.fishAvailableCount.red == 0) {
+            return;
+          }
           // Bukan Pancingannya
-          if (state.equipment !== "small") {
-            hitText.innerText = "Fish not " + state.equipment;
+          let getEquipment = state.equipmentList.find(
+            (el) => el.name === "small"
+          );
+          if (!getEquipment) {
+            hitText.innerText = "Fish not SMALL";
             hitText.style.color = "#ffffff";
             trashSound.play();
             return;
           }
-          // Umpan Habis
-          if (state.fishBait.length === 0) {
-            bite.play();
-            endDay(true);
-            sec = 0;
-            return;
-          }
-
-          let getFishBait = state.fishBait.findIndex((el) => el.name === "red");
 
           // Bukan Umpan nya
-          if (getFishBait == -1) {
-            hitText.innerText =
-              state.fishBait.length > 0
-                ? "Fish bait not RED"
-                : "Fish bait empty";
+          if (state.fishBaitCount.red == 0) {
+            hitText.innerText = "Tidak ada Umpan MERAH";
             hitText.style.color = "#ffffff";
             trashSound.play();
             return;
           }
-          state.fishBait = state.fishBait.splice(
-            getFishBait + 1,
-            state.fishBait.length
-          );
 
           //Melakukan update umpan ikan
-          updateFishBaitCount();
+          updateFishBaitCount("red");
 
           //Melakukan hitung ikan
           fishCounting("red");
@@ -561,41 +561,31 @@ onMounted(() => {
           currentScore++;
           fishTracker[0]++;
         } else if (type.contains("rare-fish")) {
-          // Bukan Pancingannya
-          if (state.equipment !== "medium") {
-            hitText.innerText = "Fish not " + state.equipment;
-            hitText.style.color = "#ffffff";
-            trashSound.play();
+          //@todo BLUE FISH AREA
+          if (state.fishAvailableCount.blue == 0) {
             return;
           }
-          // Umpan Habis
-          if (state.fishBait.length === 0) {
-            bite.play();
-            endDay(true);
-            sec = 0;
+          // Bukan Pancingannya
+          let getEquipment = state.equipmentList.find(
+            (el) => el.name === "medium"
+          );
+          if (!getEquipment) {
+            hitText.innerText = "Fish not MEDIUM";
+            hitText.style.color = "#ffffff";
+            trashSound.play();
             return;
           }
 
-          let getFishBait = state.fishBait.findIndex(
-            (el) => el.name === "blue"
-          );
           // Bukan Umpan nya
-          if (getFishBait == -1) {
-            hitText.innerText =
-              state.fishBait.length > 0
-                ? "Fish bait not BLUE"
-                : "Fish bait empty";
+          if (state.fishBaitCount.blue == 0) {
+            hitText.innerText = "Tidak ada umpan BIRU";
             hitText.style.color = "#ffffff";
             trashSound.play();
             return;
           }
-          state.fishBait = state.fishBait.splice(
-            getFishBait + 1,
-            state.fishBait.length
-          );
 
           //Melakukan update umpan ikan
-          updateFishBaitCount();
+          updateFishBaitCount("blue");
 
           //Melakukan hitung ikan
           fishCounting("blue");
@@ -607,41 +597,30 @@ onMounted(() => {
           currentScore += 5;
           fishTracker[1]++;
         } else if (type.contains("shark")) {
+          //@todo GREEN FISH AREA
+          if (state.fishAvailableCount.green == 0) {
+            return;
+          }
           //Bukan Pancingannya
-          if (state.equipment !== "large") {
-            hitText.innerText = "Fish not " + state.equipment;
+          let getEquipment = state.equipmentList.find(
+            (el) => el.name === "large"
+          );
+          if (!getEquipment) {
+            hitText.innerText = "Fish not LARGE";
             hitText.style.color = "#ffffff";
             trashSound.play();
             return;
           }
-          // Umpan Habis
-          if (state.fishBait.length === 0) {
-            bite.play();
-            endDay(true);
-            sec = 0;
-            return;
-          }
-
-          let getFishBait = state.fishBait.findIndex(
-            (el) => el.name === "green"
-          );
           // Bukan Umpan nya
-          if (getFishBait == -1) {
-            hitText.innerText =
-              state.fishBait.length > 0
-                ? "Fish bait not GREEN"
-                : "Fish bait empty";
+          if (state.fishBaitCount.green == 0) {
+            hitText.innerText = "Tidak ada umpan HIJAU";
             hitText.style.color = "#ffffff";
             trashSound.play();
             return;
           }
-          state.fishBait = state.fishBait.splice(
-            getFishBait + 1,
-            state.fishBait.length
-          );
 
           //Melakukan update umpan ikan
-          updateFishBaitCount();
+          updateFishBaitCount("green");
 
           //Melakukan hitung ikan
           fishCounting("green");
@@ -756,6 +735,8 @@ onMounted(() => {
 
   instructions.innerHTML = `<p>${days[day].instruction}</p>`;
 });
+
+
 </script>
 
 <style lang="css">
