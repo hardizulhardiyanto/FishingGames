@@ -24,6 +24,7 @@ h2 {
 }
 
 #info-wrapper {
+	display: none;
 	background-color: rgba(0, 0, 0, 0.25);
 	padding: 20px;
 	border-radius: 20px;
@@ -61,13 +62,14 @@ h2 {
 }
 
 #game-day {
+	display: none;
 	font-family: 'Black Ops One', cursive;
 }
 
 #game-score {
 	margin-top: 8px;
 	font-size: 21px;
-	display: block;
+	display: none;
 }
 
 #game__point {
@@ -551,7 +553,7 @@ button#start-btn .arrow {
 	position: absolute;
 	width: 120px;
 	height: 120px;
-	top: 80px;
+	top: 30px;
 }
 
 /* timer */

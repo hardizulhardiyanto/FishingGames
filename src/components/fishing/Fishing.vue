@@ -1,13 +1,13 @@
 <template>
   <div>
     <div id="game-container">
-      <h1 id="start-title">Gone Fishing!</h1>
+      <h1 id="start-title">Loading !!</h1>
       <div id="info-wrapper">
         <div id="instructions"></div>
         <button id="start-btn"><span class="arrow"></span></button>
       </div>
       <div id="game-stats">
-        <span id="game-day">Day 1</span>
+        <span id="game-day"></span>
 
         <div id="clock">
           <svg
@@ -18,10 +18,11 @@
           >
             <circle class="timer-backdrop" r="40" cx="60" cy="60"></circle>
             <circle class="timer-gauge" r="40" cx="60" cy="60"></circle>
-            <text y="50%" x="50%" id="game-timer" class="timer-time">15s</text>
+            <text y="50%" x="50%" id="game-timer" class="timer-time">50s</text>
           </svg>
         </div>
-        <span id="game-score">Total Score: 0</span>
+        <!-- <span id="game-score">Total Score: 0</span> -->
+        <span id="game-score"></span>
       </div>
       <p id="game-goal"></p>
       <div id="game__point">
@@ -42,11 +43,26 @@
       <span id="line"></span>
     </div>
     <div id="bubbles"></div>
+    <Dialog
+      :formTitle="dialog.formTitle"
+      :dialog="dialog.show"
+      :useAction="true"
+    >
+      <template v-slot:formItem>
+        <p>{{ dialog.text }}</p>
+      </template>
+      <template v-slot:action>
+        <v-btn color="orange" variant="tonal" @click="backDashboard()"
+          >BACK TO DASHBOARD</v-btn
+        >
+      </template>
+    </Dialog>
   </div>
 </template>
 
 <script setup>
 //@todo start
+import Dialog from "@/components/Dialog.vue";
 import { countPercentage } from "@/store/helpersLogic";
 import { watch } from "vue";
 import { computed, onMounted, reactive } from "vue";
@@ -56,6 +72,8 @@ import sound_rareBlop from "./sfx/rare-fish.mp3";
 import sound_trashSound from "./sfx/trash.mp3";
 import sound_bzzt from "./sfx/bzzt.mp3";
 import sound_bite from "./sfx/bite.mp3";
+import { useRouter } from "vue-router";
+import router from "@/router";
 
 const props = defineProps({
   loadPlayGames: {
@@ -90,6 +108,19 @@ const state = reactive({
   percentageGetFish: 0,
 });
 
+const dialog = reactive({
+  show: false,
+  formTitle: "",
+  text: "",
+});
+
+const backDashboard = () => {
+  router.push({ name: "Dashboard" });
+  setTimeout(function () {
+    window.location.reload();
+  }, 1000);
+};
+
 watch(props, (value) => {
   let { fishLoad, playerStart } = JSON.parse(
     JSON.stringify(props.loadPlayGames)
@@ -103,9 +134,12 @@ watch(props, (value) => {
 });
 
 watch(state, (val) => {
-  console.log('pre > ', state.percentageGetFish);
-
-})
+  if (state.percentageGetFish === 100) {
+    dialog.formTitle = "WINNER";
+    dialog.text = "Selamat Anda Memenangkan Permainan Score: "+state.percentageGetFish+"%";
+    dialog.show = true;
+  }
+});
 
 const updateFishBaitCount = (fish) => {
   switch (fish) {
@@ -188,12 +222,13 @@ const fishCounting = (fish) => {
         state.fishGreenAdd.percentage = getPercentage;
         if (getPercentage == getGreenFish.percentage) {
           state.percentageGetFish =
-          state.percentageGetFish + state.fishGreenAdd.percentage;
+            state.percentageGetFish + state.fishGreenAdd.percentage;
         }
       }
       break;
   }
 };
+
 
 onMounted(() => {
   const gameContainer = document.querySelector("#game-container");
@@ -230,38 +265,6 @@ onMounted(() => {
   var createJellyfishInterval = null;
   var createSharkInterval = null;
 
-  var days = [
-    {
-      day: 0,
-      score: 20,
-      instruction:
-        "<p>You are on a fishing trip!<br>There are total of 5 days to go through.<br>You need to get a certain score to proceed to the next day</p><p>Happy fishing!</p>",
-    },
-    {
-      day: 1,
-      score: 30,
-      instruction:
-        "You can catch rare fishes now.<br>They are fast, so be ready!",
-    },
-    {
-      day: 2,
-      score: 35,
-      instruction:
-        "Lately, more trash are found in the ocean.<br>There is penalty if you catch some.<br> Let's continue and avoid the trash!",
-    },
-    {
-      day: 3,
-      score: 40,
-      instruction:
-        "Jellyfishes have invaded this ocean region.<br>You will get stunned if you catch them<br>Let's continue and avoid getting stunned by them!",
-    },
-    {
-      day: 4,
-      score: 45,
-      instruction:
-        "Sharks have been sighted lately.<br>You have to restart the entire week if you catch them!<br>Let's continue and not provoke them!",
-    },
-  ];
 
   //music and sounds
   var bgm; //set bgm
@@ -299,10 +302,10 @@ onMounted(() => {
       this.sound.pause();
     };
   }
-
+  startGame() 
   //@todo start game function
   function startGame() {
-    // day = 4; //for testing
+    day = 4; //di set to 4
     //initialise sounds
     blop = new Audio(sound_blop);
     rareBlop = new Audio(sound_rareBlop);
@@ -346,28 +349,30 @@ onMounted(() => {
     gameTimer.innerText = "15s";
     gameScore.innerText = "Total Score: 0";
     let sec = 0;
-    // gameTimerInterval = setInterval(startGameTimer, 1000);
-    gameTimerInterval = 9;
-    // console.log('gameTimerInterval >>' , gameTimerInterval);
+    gameTimerInterval = setInterval(startGameTimer, 1000);
+    // gameTimerInterval = 9;
 
-    // function startGameTimer() {
-    //   gameTimer.textContent = 15 - sec + "s";
-    //   if (sec === 15) {
-    //     sec = 0;
-    //     endDay(false);
-    //     gameTimer.textContent = 15 - sec + "s";
-    //     gameTimer.classList.remove("warning");
-    //     gameTimerGauge.classList.remove("ticking");
-    //   } else {
-    //     if (sec === 1) {
-    //       gameTimerGauge.classList.add("ticking");
-    //     }
-    //     if (sec > 9) {
-    //       gameTimer.classList.add("warning");
-    //     }
-    //     sec++;
-    //   }
-    // }
+    function startGameTimer() {
+      if (state.percentageGetFish == 100) {
+        endDay(true);
+      }
+      gameTimer.textContent = 50 - sec + "s";
+      if (sec === 50) {
+        sec = 0;
+        endDay(false);
+        gameTimer.textContent = 50 - sec + "s";
+        gameTimer.classList.remove("warning");
+        gameTimerGauge.classList.remove("ticking");
+      } else {
+        if (sec === 1) {
+          gameTimerGauge.classList.add("ticking");
+        }
+        if (sec > 9) {
+          gameTimer.classList.add("warning");
+        }
+        sec++;
+      }
+    }
   }
   //create fish function
   function createFish() {
@@ -685,24 +690,13 @@ onMounted(() => {
 
     startBtn.style.top = "66%";
     if (!died) {
-      console.log(`Day${day}`);
-      if (day < 5) {
-        if (currentScore <= days[day - 1].score) {
-          instructions.innerHTML = `<h2>END OF DAY 0${day}</h2>Your score for the day: ${currentScore}</p><p>Your score is not high enough. Please try again!</p>`;
-          day = 0;
-        } else {
-          instructions.innerHTML = `<h2>END OF DAY 0${day}</h2>Your score for the day: ${currentScore}</p><p>${days[day].instruction}</p>`;
-        }
-      } else {
-        instructions.innerHTML = `<h2>You have finished the entire week!</h2><p>You have caught ${fishTracker[0]} fishes, ${fishTracker[1]} rare fishes, ${fishTracker[2]} trash and ${fishTracker[2]} jellyfishes.<br>Your Total Score: ${score}</p>`;
-        day = 0;
-      }
+      dialog.formTitle = "Kamu Kalah, mereka sangat cepat!"
+      dialog.text = "Score Terakhir: "+ state.percentageGetFish+"%"
+      dialog.show = true;
     } else {
       day = 0;
       instructions.innerHTML = `<h2>Permainan Berakhir!</h2><p>Umpan Anda Telah Habis<br>Silahkan beli umpan lagi!</p>`;
     }
-    infoWrapper.style.display = "block";
-    startTitle.style.display = "block";
   }
   //Make bubbles
   var bubbles = document.getElementById("bubbles");
@@ -733,10 +727,8 @@ onMounted(() => {
   generateBubble();
   var bubbleInterval = setInterval(generateBubble, 500);
 
-  instructions.innerHTML = `<p>${days[day].instruction}</p>`;
+  // instructions.innerHTML = `<p>${days[day].instruction}</p>`;
 });
-
-
 </script>
 
 <style lang="css">
