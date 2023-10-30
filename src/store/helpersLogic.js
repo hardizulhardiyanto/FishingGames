@@ -28,3 +28,9 @@ export const getRandomNumber = ()  =>{
     const randomIndex = Math.floor(Math.random() * options.length);
     return options[randomIndex];
 }
+
+//ex: countPercentage(5,5,50) result: 50
+export const countPercentage = (value, setNumber, percentage) => {
+  const calculatedValue = (value / setNumber) * percentage;
+  return parseInt(calculatedValue.toString().split(".")[0])
+}

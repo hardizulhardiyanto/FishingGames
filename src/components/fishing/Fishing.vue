@@ -24,6 +24,9 @@
         <span id="game-score">Total Score: 0</span>
       </div>
       <p id="game-goal"></p>
+      <div id="game__point">
+        {{ "Goal : " + state.percentageGetFish + "%" + " / 100%" }}
+      </div>
       <div id="fishbait_count">
         <p>{{ "Umpan Ikan Merah : " + state.fishBaitCount.red }}</p>
         <p>{{ "Umpan Ikan Biru : " + state.fishBaitCount.blue }}</p>
@@ -43,8 +46,9 @@
 </template>
 
 <script setup>
-import { watch } from "vue";
 //@todo start
+import { countPercentage } from "@/store/helpersLogic";
+import { watch } from "vue";
 import { computed, onMounted, reactive } from "vue";
 import sound_bgm from "./sfx/Bug_Catching.mp3";
 import sound_blop from "./sfx/fish.mp3";
@@ -74,6 +78,19 @@ const state = reactive({
     blue: 0,
     green: 0,
   },
+  fishRedAdd: {
+    count: 0,
+    percentage: 0,
+  },
+  fishBlueAdd: {
+    count: 0,
+    percentage: 0,
+  },
+  fishGreenAdd: {
+    count: 0,
+    percentage: 0,
+  },
+  percentageGetFish: 0,
 });
 
 const getData = computed(() => {
@@ -119,6 +136,59 @@ const updateFishAvailableCount = () => {
   state.fishAvailableCount.green = getGreenFish.countToday;
 };
 
+// @todo count fish
+const fishCounting = (fish) => {
+  switch (fish) {
+    case "red":
+      if (state.fishAvailableCount.red - 1 >= 0) {
+        state.fishAvailableCount.red = state.fishAvailableCount.red - 1;
+        state.fishRedAdd.count = state.fishRedAdd.count += 1;
+        //Counting Percentage
+        let getRedFish = state.fishLoad.find((el) => el.fishColor === "red");
+        let getPercentage = countPercentage(
+          state.fishRedAdd.count,
+          getRedFish.countToday,
+          getRedFish.percentage
+        );
+        state.fishRedAdd.percentage = getPercentage;
+        state.percentageGetFish =
+          state.percentageGetFish + state.fishRedAdd.percentage;
+      }
+
+      break;
+    case "blue":
+      if (state.fishAvailableCount.blue - 1 >= 0) {
+        state.fishAvailableCount.blue = state.fishAvailableCount.blue - 1;
+        //Counting Percentage
+        let getBlueFish = state.fishLoad.find((el) => el.fishColor === "blue");
+        let getPercentage = countPercentage(
+          state.fishBlueAdd.count,
+          getBlueFish.countToday,
+          getBlueFish.percentage
+        );
+        state.fishBlueAdd.percentage = getPercentage;
+        state.percentageGetFish =
+          state.percentageGetFish + state.fishBlueAdd.percentage;
+      }
+      break;
+    case "green":
+      if (state.fishAvailableCount.green - 1 >= 0) {
+        state.fishAvailableCount.green = state.fishAvailableCount.green - 1;
+        //Counting Percentage
+        let getGreenFish = state.fishLoad.find((el) => el.fishColor === "green");
+        let getPercentage = countPercentage(
+          state.fishGreenAdd.count,
+          getGreenFish.countToday,
+          getGreenFish.percentage
+        );
+        state.fishGreenAdd.percentage = getPercentage;
+        state.percentageGetFish =
+          state.percentageGetFish + state.fishGreenAdd.percentage;
+      }
+      break;
+  }
+};
+
 onMounted(() => {
   const gameContainer = document.querySelector("#game-container");
   const clickContainer = document.querySelector("#click-container");
@@ -130,6 +200,7 @@ onMounted(() => {
   const startBtn = document.querySelector("#start-btn");
   const gameStats = document.querySelector("#game-stats");
   const gameGoal = document.querySelector("#game-goal");
+  const gamePoint = document.querySelector("#game__point");
   const fishBaitCount = document.querySelector("#fishbait_count");
   const fishAvailableCount = document.querySelector("#fishavailable_count");
   const gameDay = document.querySelector("#game-day");
@@ -244,6 +315,7 @@ onMounted(() => {
     clickContainer.style.display = "block";
     gameStats.style.display = "flex";
     gameGoal.style.display = "block";
+    gamePoint.style.display = "block";
     fishBaitCount.style.display = "block";
     fishAvailableCount.style.display = "block";
 
@@ -255,8 +327,8 @@ onMounted(() => {
   function createItems() {
     createTimer();
     day++;
-    gameDay.innerText = "Day 0" + day;
-    gameGoal.innerText = `Goal: ${currentScore}/${days[day - 1].score}`;
+    // gameDay.innerText = "Day 0" + day;
+    // gameGoal.innerText = `Goal: ${currentScore}/${days[day - 1].score}`;
 
     createFishInterval = setInterval(createFish, 250);
     createRareFishInterval = setInterval(createRareFish, 1250);
@@ -442,6 +514,7 @@ onMounted(() => {
       hitText.style.top = this.style.top;
       if (!this.classList.contains("caught")) {
         this.classList.add("caught");
+        // RED
         if (type.contains("fish")) {
           // Bukan Pancingannya
           if (state.equipment !== "small") {
@@ -478,8 +551,8 @@ onMounted(() => {
           //Melakukan update umpan ikan
           updateFishBaitCount();
 
-          //Melakukan update ikan
-          state.fishAvailableCount.red = state.fishAvailableCount.red - 1;
+          //Melakukan hitung ikan
+          fishCounting("red");
 
           hitText.innerText = "+1";
           hitText.style.color = "#00ffcd";
@@ -524,8 +597,8 @@ onMounted(() => {
           //Melakukan update umpan ikan
           updateFishBaitCount();
 
-          //Melakukan update ikan
-          state.fishAvailableCount.blue = state.fishAvailableCount.blue - 1;
+          //Melakukan hitung ikan
+          fishCounting("blue");
 
           hitText.innerText = "+5";
           hitText.style.color = "#9766d3";
@@ -570,8 +643,8 @@ onMounted(() => {
           //Melakukan update umpan ikan
           updateFishBaitCount();
 
-          //Melakukan update ikan
-          state.fishAvailableCount.green = state.fishAvailableCount.green - 1;
+          //Melakukan hitung ikan
+          fishCounting("green");
 
           hitText.innerText = "+5";
           hitText.style.color = "#9766d3";
@@ -607,8 +680,8 @@ onMounted(() => {
         setTimeout(function () {
           clickContainer.removeChild(hitText);
         }, 1000);
-        gameScore.innerText = `Total Score: ${score}`;
-        gameGoal.innerText = `Goal: ${currentScore}/${days[day - 1].score}`;
+        // gameScore.innerText = `Total Score: ${score}`;
+        // gameGoal.innerText = `Goal: ${currentScore}/${days[day - 1].score}`;
       }
     }
   }
@@ -627,6 +700,7 @@ onMounted(() => {
     gameStats.style.display = "none";
     clickContainer.style.display = "none";
     gameGoal.style.display = "none";
+    gamePoint.style.display = "none";
     fishBaitCount.style.display = "none";
     fishAvailableCount.style.display = "none";
 
