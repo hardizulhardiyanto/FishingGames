@@ -2,19 +2,37 @@
   <div class="dashboard__hero">
     <v-container class="d-flex justify-center" fluid style="height: 100%">
       <v-card elevation="4" class="dashboard__player" width="1000">
-        <v-card-item style="height: 100%;">
+        <v-card-item style="height: 100%">
           <v-row align="center" justify="center">
             <v-col>
-                <UserInfo 
-                    :username="state.userName"
-                    :gold="state.gold"
-                />
-                <FishInfo />
+              <UserInfo :username="state.userName" :gold="state.gold" />
+              <FishInfo :textInfo="state.textInfo" />
             </v-col>
             <v-col>
-              <v-btn block @click="router.push({name: 'Play'})">PLAY GAMES</v-btn>
-            </v-col>
+              <v-card class="pa-3">
+                <v-card-title class="text-subtitle-1"
+                  >Beli Pancingan</v-card-title
+                >
+                <v-card-item>
+                  <v-select
+                    v-model="pancingan.select"
+                    :items="pancingan.itemsMp"
+                    item-title="name"
+                    item-value="price"
+                    label="Select"
+                    persistent-hint
+                    return-object
+                    single-line
+                    multiple
+                  >
+                  </v-select>
+                </v-card-item>
+              </v-card>
 
+              <v-btn block @click="router.push({ name: 'Play' })"
+                >PLAY GAMES</v-btn
+              >
+            </v-col>
           </v-row>
         </v-card-item>
       </v-card>
@@ -27,7 +45,7 @@ import FishInfo from "@/components/FishInfo.vue";
 import UserInfo from "@/components/UserInfo.vue";
 import { useStartingAppStore } from "@/store/startingApp";
 import { reactive } from "vue";
-import { useRouter } from "vue-router"
+import { useRouter } from "vue-router";
 
 const startingAppStore = useStartingAppStore();
 const router = useRouter();
@@ -37,17 +55,29 @@ const state = reactive({
   fishEquip: [],
   fishBait: [],
   fishLoadTarget: [],
+  textInfo: "",
+});
+
+const pancingan = reactive({
+  select: [],
+  itemsMp: [],
 });
 
 const getUsers = async () => {
   let userDetail = await startingAppStore.getUser();
   state.userName = userDetail.userName;
-  state.gold = userDetail.gold
-  // console.log("userDetail >> ", userDetail);
+  state.gold = userDetail.gold;
   let loadFishingTarget = await startingAppStore.loadFishTarget();
-  // console.log("loadFishingTarget >> ", loadFishingTarget);
+  state.textInfo = `Hari ini kami melihat ${loadFishingTarget[0].countToday} ikan kecil, ${loadFishingTarget[1].countToday} ikan sedang, dan ${loadFishingTarget[2].countToday} ikan besar. ${loadFishingTarget[0].percentage}% ikan berwarna merah, ${loadFishingTarget[1].percentage}% berwarna biru, ${loadFishingTarget[2].percentage}% berwarna hijau.`;
   let loadRequrement = await startingAppStore.getRequirement();
-  // console.log("loadRequrement >> ", loadRequrement);
+  if (loadRequrement.fishEquipment.length > 0) {
+    loadRequrement = loadRequrement.fishEquipment.map((el) => {
+      el.name = el.name + " GOLD: " + el.price;
+      return el;
+    });
+  }
+  pancingan.itemsMp = loadRequrement;
+  console.log("loadRequrement >> ", loadRequrement);
 };
 
 getUsers();
