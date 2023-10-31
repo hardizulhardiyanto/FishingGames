@@ -12,23 +12,7 @@ export const useStartingAppStore = defineStore({
     fishTarget: [],
     playerStart: {
       equipment: "small", //pancingan
-      equipmentList: [
-        {
-          name: "small",
-          price: 5,
-          fishCatch: "small",
-        },
-        {
-          name: "medium",
-          price: 10,
-          fishCatch: "medium",
-        },
-        {
-          name: "large",
-          price: 15,
-          fishCatch: "large",
-        },
-      ],
+      equipmentList: [],
       fishBait: [
         // {
         //   name: "red",
@@ -51,15 +35,49 @@ export const useStartingAppStore = defineStore({
         //   fishCatch: 1,
         // },
       ],
-      fishBaitCount: {
+      fishBaitCount_old: {
         red: 10,
         blue: 10,
         green: 10
-      }
+      },
+      fishBaitCount: {}
     },
   }),
 
   actions: {
+    async transactionClear(payload) {
+      let rawObject = JSON.parse(JSON.stringify(payload))
+      
+      //set new data
+      let userEnter = cookies.get("userEnter");
+      let userSet = {
+        date: Date.now(),
+        userName: userEnter.userName,
+        gold: rawObject.gold,
+      };
+      cookies.set("userEnter", JSON.stringify(userSet));
+
+      let equipmentList = []
+      //set equipment
+      if (rawObject.listPancing.length > 0) {
+        rawObject.listPancing.map((el) => {
+          equipmentList.push({
+            name: el.fishCatch,
+            price: el.price,
+            fishCatch: el.fishCatch,
+          },)
+        })
+      }
+      //Set Equipment
+      this.playerStart.equipmentList = equipmentList;
+      //set umpan
+      this.playerStart.fishBaitCount =  {
+        red: parseInt(rawObject.listUmpan.redFish),
+        blue: parseInt(rawObject.listUmpan.blueFish),
+        green: parseInt(rawObject.listUmpan.greenFish)
+      }
+      
+    },
     async enterUser(userName) {
       let userSet = {
         date: Date.now(),

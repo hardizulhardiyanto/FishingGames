@@ -2,7 +2,7 @@
     <v-dialog
       v-model="props.dialog"
       persistent
-      :max-width="dialog.widthCard"
+      :max-width="props.useWidthCard"
       overlay-opacity="0.20"
       scrollable
     >
@@ -59,7 +59,7 @@
     },
     useWidthCard: {
       type: Number,
-      default: () => 0,
+      default: () => 850,
     }
   });
   
